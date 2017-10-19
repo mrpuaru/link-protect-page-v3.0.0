@@ -11,6 +11,6 @@ Tài khoản: vynghia<br />
 Mật khẩu: nghiabestgay2k2<br />
 Ở trên trang có các mục đích để bạn lựa chọn [Quản lý liên kết/Tạo liên kết/Đăng xuất]<br />
 <br />
----
+<hr />
 (c) 2017 Vy Nghia<br />
 Chịu trách nghiệm bởi Vy Nghĩa.<br />
