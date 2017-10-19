@@ -8,7 +8,6 @@ Link Protect (v3.0.0) - Free
 1. Vào developers.facebook.com và console.cloud.google.com để tạo/nhận App ID & App Secret (Facebook) và Short URL Api Key (Google)
 2. Vào _system/config.php để cấu hình cho đúng với các dữ liệu được liệt kê.
 *Không được config thiếu sót, nếu không web sẽ không chạy.<br />
-<br />
 3. Vào http://domain.com/_system/admin điền<br />
 Tài khoản: vynghia<br />
 Mật khẩu: nghiabestgay2k2<br />
