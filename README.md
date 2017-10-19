@@ -2,8 +2,8 @@
 Link Protect v3.0.0 (Free) phiên bản giống anlink.top dành cho Page Facebook!
 - Link Protect là 1 loại web Khóa Liên Kết được lấy ý tưởng từ Nguyen Huu Dat của J2TEAM Community sử dụng giao (sao chép) của anlink.top!<br />
 
-Tác giả: Vy Nghĩa (Nghia is Gay)<br />
-Fanpage: <a href="https://www.facebook.com/NghiaisGay" target="blank">https://www.facebook.com/NghiaisGay</a>
+<strong>Tác giả</strong>: Vy Nghĩa (Nghia is Gay)<br />
+<strong>Fanpage</strong>: <a href="https://www.facebook.com/NghiaisGay" target="blank">https://www.facebook.com/NghiaisGay</a>
 <br /><br />
 [Hướng dẫn]
 1. Vào developers.facebook.com và console.cloud.google.com để tạo/nhận App ID & App Secret (Facebook) và Short URL Api Key (Google)
