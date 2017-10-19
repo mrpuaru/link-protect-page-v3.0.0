@@ -4,7 +4,7 @@ Link Protect v3.0.0 (Free) phiên bản giống anlink.top dành cho Page Facebo
 
 Tác giả: Vy Nghĩa (Nghia is Gay)<br />
 Fanpage: <a href="https://www.facebook.com/NghiaisGay" target="blank">https://www.facebook.com/NghiaisGay</a>
-<br />
+<br /><br />
 [Hướng dẫn]
 1. Vào developers.facebook.com và console.cloud.google.com để tạo/nhận App ID & App Secret (Facebook) và Short URL Api Key (Google)
 2. Vào _system/config.php để cấu hình cho đúng với các dữ liệu được liệt kê.
