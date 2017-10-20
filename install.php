@@ -2,7 +2,7 @@
 /* Developed by Vy Nghiz */
 session_start();
 require '_system/config.php';
-if(isset($_POST['web']) && isset($_POST['page']) && isset($_POST['dbhost']) && isset($_POST['dbuser']) && isset($_POST['dbpass']) && isset($_POST['dbname'])){
+if(isset($_SESSION['install']) && isset($_POST['web']) && isset($_POST['page']) && isset($_POST['dbhost']) && isset($_POST['dbuser']) && isset($_POST['dbpass']) && isset($_POST['dbname'])){
   echo 'ok';
   $ConfigFile = fopen("_system/config.php", "w") or die("Không thể khởi tạo file này!");
   $ConfigContent = '<?php
