@@ -24,7 +24,7 @@ if(empty($Password)){
 }
 
 function FacebookName($Token, $ID){
-	$ProfileApi = 'https://graph.facebook.com/me?access_token='.$Token;
+	$ProfileApi = 'https://graph.facebook.com/'.$ID.'?access_token='.$Token;
 	$user = json_decode(file_get_contents($ProfileApi, true));
   return $user->name;
 }
