@@ -51,12 +51,11 @@ if (isset($accessToken)) {
 
 	// redirect the user back to the same page if it has "code" GET variable
 	if (isset($_GET['code'])) {
-    if(!isset( $_SERVER[ 'HTTP_REFERER' ] ) || trim($_SERVER[ 'HTTP_REFERER' ]) == '' ) {
-    $referer = "javascript://history.go(-1)" ;
-    } else {
-    $referer = $_SERVER[ 'HTTP_REFERER' ];
-    }
-    header("Location:{$referer} ") ;
+		if(isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] !== 'https://www.facebook.com/'){
+		  header("Location: {$_SERVER['HTTP_REFERER']}");
+		} else {
+			header("Location: /");
+		}
 	}
 
 	// getting basic info about user
