@@ -1,78 +1,80 @@
 <?php
 /* >_ Developed by Vy Nghĩa */
+error_reporting(0);
 require_once 'login.php';
 
-if(isset($accessToken)):
-$sHash = $_GET['x'];
+if(isset($accessToken)){
+	$sHash = $_GET['x'];
 
-$CheckHash = mysql_query("SELECT * FROM `link` WHERE `Hash` = '$sHash'");
-$URL = mysql_fetch_array($CheckHash);
-if(isset($URL['Password'])){
-  if(isset($_POST['password'])){
-    if($_POST['password'] == $URL['Password']){
-      $Password = true;
-    } else {
-      $Password = false;
-    }
-  }
-}
+	$CheckHash = mysql_query("SELECT * FROM `link` WHERE `Hash` = '$sHash'");
+	$URL = mysql_fetch_array($CheckHash);
+	if(isset($URL['Password'])){
+		if($URL['Password'] !== ""){
+			$PasswordLocked = true;
+			if(isset($_POST['password'])){
+				if($_POST['password'] == $URL['Password']){
+					unset($PasswordLocked);
+				}
+			} else {
+				$Password = null;
+			}
+		}
+	}
 
-if(empty($Password)){
-  $Password = true;
-}
+	function FacebookName($Token, $ID){
+		$ProfileApi = 'https://graph.facebook.com/'.$ID.'?access_token='.$Token;
+		$user = json_decode(file_get_contents($ProfileApi, true));
+	  return $user->name;
+	}
 
-function FacebookName($Token, $ID){
-	$ProfileApi = 'https://graph.facebook.com/me?access_token='.$Token;
-	$user = json_decode(file_get_contents($ProfileApi, true));
-  return $user->name;
-}
+	function userID($Token){
+	  global $userID, $userName;
+		$ProfileApi = 'https://graph.facebook.com/me?access_token='.$Token;
+		$user = json_decode(file_get_contents($ProfileApi, true));
+		$userID = $user->id;
+	  $userName = $user->name;
+	}
 
-function userID($Token){
-  global $userID, $userName;
-	$ProfileApi = 'https://graph.facebook.com/me?access_token='.$Token;
-	$user = json_decode(file_get_contents($ProfileApi, true));
-	$userID = $user->id;
-  $userName = $user->name;
-}
+	function Fanpage($PageID, $Token, $Hashtag, $PostID, $userID){
+		global $FoundPost, $FoundPostID, $FoundPostURL, $Liked;
+		//Feed (timeline) data
+		$FeedApi = 'https://graph.facebook.com/'.$PageID.'/feed?limit=100&access_token='.$Token;
+		$FeedJson = json_decode(file_get_contents($FeedApi), true);
 
-function Fanpage($PageID, $Token, $Hashtag, $PostID, $userID){
-	global $FoundPost, $FoundPostID, $FoundPostURL, $Liked;
-	//Feed (timeline) data
-	$FeedApi = 'https://graph.facebook.com/'.$PageID.'/feed?limit=100&access_token='.$Token;
-	$FeedJson = json_decode(file_get_contents($FeedApi), true);
+		if(is_array($FeedJson) or is_object($FeedJson)){
+			foreach($FeedJson['data'] as &$feed) {
+				if(strpos(@$feed['message'], $Hashtag) !== FALSE) {
+					$FoundPost = true;
+					$FoundPostID = str_replace($PageID.'_', '',$feed['id']);
 
-	if(is_array($FeedJson) or is_object($FeedJson)){
-		foreach($FeedJson['data'] as &$feed) {
-			if(strpos(@$feed['message'], $Hashtag) !== FALSE) {
-				$FoundPost = true;
-				$FoundPostID = str_replace($PageID.'_', '',$feed['id']);
+					//Get info Post
+					$PostApi = 'https://graph.facebook.com/v2.10/'.$PageID.'_'.$FoundPostID.'?fields=id,permalink_url,message&access_token='.$Token;
+					$PostPage = json_decode(file_get_contents($PostApi));
 
-				//Get info Post
-				$PostApi = 'https://graph.facebook.com/v2.10/'.$PageID.'_'.$FoundPostID.'?fields=id,permalink_url,message&access_token='.$Token;
-				$PostPage = json_decode(file_get_contents($PostApi));
+					$FoundPostURL = $PostPage->permalink_url;
 
-				$FoundPostURL = $PostPage->permalink_url;
-
-				//Search user reactions ID
-				$LikeApi = 'https://graph.facebook.com/v2.10/'.$PageID.'_'.$FoundPostID.'/reactions?fields=id&pretty=0&live_filter=no_filter&limit=5000&access_token='.$Token;
-				$FindLike = json_decode(file_get_contents($LikeApi));
-				foreach($FindLike->data as $like){
-				if($like->id == $userID){
-					$Liked = true;
+					//Search user reactions ID
+					$LikeApi = 'https://graph.facebook.com/v2.10/'.$PageID.'_'.$FoundPostID.'/reactions?fields=id&pretty=0&live_filter=no_filter&limit=5000&access_token='.$Token;
+					$FindLike = json_decode(file_get_contents($LikeApi));
+					foreach($FindLike->data as $like){
+					if($like->id == $userID){
+						$Liked = true;
+						}
 					}
 				}
 			}
 		}
 	}
-}
 
-userID($accessToken);
-Fanpage(PAGEID, $accessToken, $URL['Hash'], $URL['PostID'], $userID);
+	userID($accessToken);
+	Fanpage(PAGEID, $accessToken, $URL['Hash'], $URL['PostID'], $userID);
 
-if($FoundPost == true && $PostID == 0){
-	mysql_query("UPDATE `link` SET `PostID` = '$FoundPostID' WHERE `Hash` = '$sHash'");
+	if($FoundPost == true && $PostID == 0){
+		mysql_query("UPDATE `link` SET `PostID` = '$FoundPostID' WHERE `Hash` = '$sHash'");
+	}
+} else {
+	$_SESSION['back'] = $_SERVER['REQUEST_URI'];
 }
-endif;
 
 ?>
 <!DOCTYPE html>
@@ -161,8 +163,8 @@ Chào, <a href="https://facebook.com/" target="_blanks"><strong><?php echo isset
 <strong>Kiểm tra điều kiện mở khóa:</strong><br />
 <label class="checkbox ct-blue" for="checkbox1"><input type="checkbox" value="" data-toggle="checkbox" <?php echo ($FoundPost == true) ? 'checked' : null; ?>><?php echo ($FoundPost == true) ? 'Đã xác nhận #hashtag của liên kết này' : 'Liên kết này chưa được gắn #hashtag'; ?></label>
 <label class="checkbox ct-red" for="checkbox1"><input type="checkbox" value="" data-toggle="checkbox" <?php echo ($Liked == true) ? 'checked' : null; ?>><?php echo ($Liked == true) ? 'Bạn đã thích bài viết của liên kết này' : 'Bạn chưa thích bài viết của liên kết này'; ?></label>
-<label class="checkbox ct-orange" for="checkbox1"><input type="checkbox" value="" data-toggle="checkbox" <?php echo ($Password == true) ? 'checked' : null; ?>><?php echo ($Password == true) ? 'Khóa mật khẩu - OK!' : 'Liên kết này có mật khẩu, hãy điền mật khẩu để mở khóa'; ?></label>
-<?php if(!$Password): ?>
+<label class="checkbox ct-orange" for="checkbox1"><input type="checkbox" value="" data-toggle="checkbox" <?php echo (empty($PasswordLocked)) ? 'checked' : null; ?>><?php echo (empty($PasswordLocked)) ? 'Khóa mật khẩu - OK!' : 'Liên kết này có mật khẩu, hãy điền mật khẩu để mở khóa'; ?></label>
+<?php if(isset($PasswordLocked) && $PasswordMode == true): ?>
 <form action="" method="POST">
 <div class="input-group">
 <input type="text" name="password" class="form-control" placeholder="Vui lòng nhập mật khẩu">
@@ -201,7 +203,7 @@ Chào, <a href="https://facebook.com/" target="_blanks"><strong><?php echo isset
 <div id="qc" style="font-weight: bold; font-size: 17px;text-align: center;"></div>
 </div>
 </div> -->
-<?php if(isset($FoundPost) && isset($Liked)): ?>
+<?php if(isset($FoundPost) && isset($Liked) && empty($PasswordLocked)): ?>
 <div class="panel panel-primary">
 <div class="panel-heading"><i class="fa fa-unlock"></i> Nội dung ẩn</div>
 <div class="panel-body">
