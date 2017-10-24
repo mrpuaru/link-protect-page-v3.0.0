@@ -1,5 +1,5 @@
 <?php
-/* >_ Developed by Vy Nghĩa */
+/* >_ Developed by Vy Nghia */
 session_start();
 require_once 'SDK/Facebook/autoload.php';
 require '_system/config.php';
